@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣股市投資競賽</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 登入頁面 */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-box h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* 主遊戲介面 */
+        .game-container {
+            display: none;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .status-bar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .status-value.cash {
+            color: #27ae60;
+        }
+
+        .status-value.warning {
+            color: #e74c3c;
+        }
+
+        .timer-notice {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid #ffc107;
+        }
+
+        .timer-notice.urgent {
+            background: #f8d7da;
+            border-left-color: #e74c3c;
+        }
+
+        .timer-notice.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .timer-notice.info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .stocks-panel, .ranking-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .panel-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .stock-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 120px;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .stock-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stock-code {
+            font-weight: 700;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .stock-name {
+            color: #666;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .stock-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #27ae60;
+        }
+
+        .stock-change {
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .stock-change.up {
+            color: #e74c3c;
+        }
+
+        .stock-change.down {
+            color: #27ae60;
+        }
+
+        .stock-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stock-input label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stock-input input {
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .stock-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stock-input input:disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        .buy-btn {
+            padding: 10px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .buy-btn:hover {
+            background: #5568d3;
+        }
+
+        .buy-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .confirm-btn, .reset-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .confirm-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            background: #229954;
+        }
+
+        .confirm-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .reset-btn {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .ranking-item.current-player {
+            background: #e8f4f8;
+            border: 2px solid #667eea;
+        }
+
+        .rank-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .rank-1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+        }
+
+        .rank-2 {
+            background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+            color: white;
+        }
+
+        .rank-3 {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            color: white;
+        }
+
+        .rank-other {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .player-details {
+            flex: 1;
+        }
+
+        .player-name {
+            font-weight: 700;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .player-stats {
+            color: #666;
+            font-size: 14px;
+            margin-top: 3px;
+        }
+
+        .player-score {
+            font-weight: 700;
+            font-size: 18px;
+            color: #667eea;
+        }
+
+        .update-time {
+            color: #666;
+            font-size: 12px;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .stock-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 登入頁面 -->
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <h1>🏆 台灣股市投資競賽</h1>
+            <p>請輸入您的帳號開始遊戲</p>
+            <div class="input-group">
+                <label>帳號</label>
+                <input type="text" id="accountInput" placeholder="請輸入帳號">
+            </div>
+            <div class="input-group">
+                <label>玩家名稱</label>
+                <input type="text" id="nameInput" placeholder="請輸入玩家名稱">
+            </div>
+            <button class="login-btn" id="loginBtn">開始遊戲</button>
+            <div class="error-msg" id="errorMsg"></div>
+        </div>
+    </div>
+
+    <!-- 主遊戲介面 -->
+    <div class="container game-container" id="gamePage">
+        <div class="header">
+            <h1>🏆 台灣股市投資競賽</h1>
+            <div class="user-info">
+                <div class="user-name" id="userName"></div>
+                <button class="logout-btn" id="logoutBtn">登出</button>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-label">當前時間</div>
+                <div class="status-value" id="currentTime">--:--:--</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">可用資金</div>
+                <div class="status-value cash" id="availableCash">$1,000,000</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">已投資金額</div>
+                <div class="status-value" id="investedAmount">$0</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">總市值</div>
+                <div class="status-value" id="totalValue">$1,000,000</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">本週積分</div>
+                <div class="status-value" id="weeklyScore">0</div>
+            </div>
+        </div>
+
+        <!-- 測試模式控制面板 - 只有BC可見 -->
+        <div id="testModePanel" style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ffc107; display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <strong>🔧 測試模式（僅限BC帳號）</strong>
+                    <span id="testModeStatus" style="margin-left: 10px; color: #666;">關閉</span>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="toggleTestMode()" style="padding: 8px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                        開啟/關閉測試模式
+                    </button>
+                    <button onclick="setSimulatedTime(8, 30)" style="padding: 8px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                        模擬交易時間
+                    </button>
+                    <button onclick="resetSimulatedTime()" style="padding: 8px 20px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                        恢復真實時間
+                    </button>
+                    <button onclick="clearGameData()" style="padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                        清除所有數據
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="timerNotice"></div>
+
+        <div class="main-content">
+            <div class="stocks-panel">
+                <h2 class="panel-title">📈 熱門股票 (每日 8:30 更新)</h2>
+                <div id="stocksList"></div>
+                <div class="action-buttons">
+                    <button class="confirm-btn" id="confirmBtn">確認投資</button>
+                    <button class="reset-btn" id="resetBtn">重設</button>
+                </div>
+                <div class="update-time" id="updateTime"></div>
+            </div>
+
+            <div class="ranking-panel">
+                <h2 class="panel-title">🏅 即時排名</h2>
+                <div id="rankingList"></div>
+            </div>
+        </div>
+
+        <!-- 投資組合顯示 -->
+        <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 25px;">
+            <h2 class="panel-title">💼 所有玩家投資組合</h2>
+            <div id="portfolioDisplay"></div>
+        </div>
+    </div>
+
+    <script>
+        // 遊戲設定
+        const ACCOUNTS = {
+            'mosh': '玩家1',
+            'BC': '玩家2',
+            '老闆': '玩家3',
+            '書瑋': '玩家4',
+            '忠憲': '玩家5',
+            '張技師': '玩家6'
+        };
+
+        const INITIAL_CASH = 1000000;
+        const SCORE_MAP = [10, 7, 6, 2, 0, -1];
+        const FRIDAY_MULTIPLIER = 2;
+        
+        // 🔧 測試模式開關 - 設為 true 可隨時交易
+        let TEST_MODE = false;
+        
+        // 測試用的模擬時間
+        let simulatedTime = null;
+
+        // 10隻台灣熱門股票
+        let stocks = [
+            { code: '2330', name: '台積電', price: 685, change: 2.5 },
+            { code: '2317', name: '鴻海', price: 156, change: -1.2 },
+            { code: '2454', name: '聯發科', price: 1095, change: 3.8 },
+            { code: '2308', name: '台達電', price: 368, change: 1.5 },
+            { code: '2303', name: '聯電', price: 48.5, change: -0.5 },
+            { code: '2882', name: '國泰金', price: 62.8, change: 0.8 },
+            { code: '2412', name: '中華電', price: 125, change: 0.3 },
+            { code: '2881', name: '富邦金', price: 89.5, change: -0.7 },
+            { code: '6505', name: '台塑化', price: 98.2, change: 1.1 },
+            { code: '1301', name: '台塑', price: 102, change: 0.9 }
+        ];
+
+        let currentUser = null;
+        let gameData = loadGameData();
+
+        // 等待 DOM 加載完成
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('頁面已載入');
+            
+            // 綁定登入按鈕
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', handleLogin);
+                console.log('登入按鈕已綁定');
+            }
+            
+            // 綁定登出按鈕
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+                console.log('登出按鈕已綁定');
+            }
+            
+            // 綁定確認投資按鈕
+            const confirmBtn = document.getElementById('confirmBtn');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function() {
+                    console.log('確認投資按鈕事件觸發');
+                    confirmInvestment();
+                });
+                console.log('確認投資按鈕已綁定');
+            }
+            
+            // 綁定重設按鈕
+            const resetBtn = document.getElementById('resetBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetInvestment);
+                console.log('重設按鈕已綁定');
+            }
+            
+            // 開始時鐘
+            setInterval(updateTime, 1000);
+            setInterval(updateTimerNotice, 60000);
+            updateTime();
+            
+            console.log('所有事件監聽器已綁定');
+        });
+
+        // 載入遊戲數據
+        function loadGameData() {
+            console.log('載入遊戲數據...');
+            const saved = localStorage.getItem('stockGameData');
+            const data = saved ? JSON.parse(saved) : {};
+            
+            console.log('從 localStorage 載入的數據:', data);
+            
+            // 確保所有玩家都有數據結構
+            Object.keys(ACCOUNTS).forEach(account => {
+                if (!data[account]) {
+                    console.log(`初始化 ${account} 的數據`);
+                    data[account] = {
+                        name: ACCOUNTS[account],
+                        cash: INITIAL_CASH,
+                        investments: {},
+                        totalValue: INITIAL_CASH,
+                        weeklyScore: 0
+                    };
+                } else {
+                    // 確保現有玩家有 investments 屬性
+                    if (!data[account].investments) {
+                        console.log(`為 ${account} 添加 investments 屬性`);
+                        data[account].investments = {};
+                    }
+                }
+            });
+            
+            console.log('最終遊戲數據:', data);
+            return data;
+        }
+
+        // 保存遊戲數據
+        function saveGameData() {
+            console.log('保存遊戲數據到 localStorage:', gameData);
+            localStorage.setItem('stockGameData', JSON.stringify(gameData));
+            console.log('保存完成');
+        }
+
+        // 處理登入
+        function handleLogin() {
+            console.log('登入按鈕被點擊');
+            
+            const account = document.getElementById('accountInput').value.trim();
+            const name = document.getElementById('nameInput').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+
+            // 重置錯誤訊息
+            errorMsg.style.display = 'none';
+
+            // 驗證輸入
+            if (!account || !name) {
+                errorMsg.textContent = '請輸入帳號和玩家名稱';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // 驗證帳號
+            if (!ACCOUNTS[account]) {
+                errorMsg.textContent = '帳號錯誤，無法進行遊戲';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            currentUser = {
+                account: account,
+                name: name
+            };
+
+            // 更新玩家名稱
+            gameData[account].name = name;
+            saveGameData();
+
+            // 顯示遊戲頁面
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('gamePage').style.display = 'block';
+            document.getElementById('userName').textContent = name;
+
+            // 初始化遊戲
+            initGame();
+            
+            console.log('已進入遊戲');
+        }
+
+        // 處理登出
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('gamePage').style.display = 'none';
+            document.getElementById('accountInput').value = '';
+            document.getElementById('nameInput').value = '';
+        }
+
+        // 初始化遊戲
+        function initGame() {
+            // 只有BC可以使用測試模式
+            if (currentUser.account === 'BC') {
+                document.getElementById('testModePanel').style.display = 'block';
+            } else {
+                document.getElementById('testModePanel').style.display = 'none';
+            }
+            
+            updateStocksList();
+            updatePlayerStatus();
+            updateRankings();
+            updateTimerNotice();
+            updatePortfolioDisplay();
+        }
+
+        // 更新時間
+        function updateTime() {
+            const now = simulatedTime || new Date();
+            const timeString = now.toLocaleTimeString('zh-TW');
+            const timeDisplay = simulatedTime ? `🔧 ${timeString}` : timeString;
+            document.getElementById('currentTime').textContent = timeDisplay;
+        }
+
+        // 更新股票列表
+        function updateStocksList() {
+            const container = document.getElementById('stocksList');
+            const player = gameData[currentUser.account];
+            const now = simulatedTime || new Date();
+            const canTrade = checkTradingTime(now);
+            
+            container.innerHTML = stocks.map(stock => `
+                <div class="stock-item">
+                    <div class="stock-info">
+                        <div class="stock-code">${stock.code}</div>
+                        <div class="stock-name">${stock.name}</div>
+                    </div>
+                    <div>
+                        <div class="stock-price">$${stock.price.toFixed(2)}</div>
+                        <div class="stock-change ${stock.change >= 0 ? 'up' : 'down'}">
+                            ${stock.change >= 0 ? '▲' : '▼'} ${Math.abs(stock.change)}%
+                        </div>
+                    </div>
+                    <div class="stock-input">
+                        <label>購買股數</label>
+                        <input type="number" 
+                               id="shares_${stock.code}" 
+                               min="0" 
+                               value="${player.investments[stock.code] || 0}"
+                               onchange="calculateInvestment()"
+                               ${canTrade ? '' : 'disabled'}>
+                    </div>
+                    <button class="buy-btn" 
+                            onclick="quickBuy('${stock.code}')"
+                            ${canTrade ? '' : 'disabled'}>
+                        快速+10
+                    </button>
+                </div>
+            `).join('');
+
+            const updateTimeEl = document.getElementById('updateTime');
+            updateTimeEl.textContent = `最後更新: ${now.toLocaleString('zh-TW')}`;
+            
+            // 更新按鈕狀態
+            document.getElementById('confirmBtn').disabled = !canTrade;
+        }
+
+        // 檢查交易時間
+        function checkTradingTime(now) {
+            // 🔧 測試模式：永遠返回 true
+            if (TEST_MODE) {
+                return true;
+            }
+            
+            // 如果有模擬時間，使用模擬時間
+            if (simulatedTime) {
+                now = simulatedTime;
+            }
+            
+            const day = now.getDay();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            
+            // 週一到週五
+            if (day >= 1 && day <= 5) {
+                // 8:00 到 8:59
+                if (hour === 8 && minute < 59) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // 快速買入
+        function quickBuy(code) {
+            const input = document.getElementById(`shares_${code}`);
+            const currentShares = parseInt(input.value) || 0;
+            input.value = currentShares + 10;
+            calculateInvestment();
+        }
+
+        // 計算投資金額
+        function calculateInvestment() {
+            let totalInvested = 0;
+
+            stocks.forEach(stock => {
+                const shares = parseInt(document.getElementById(`shares_${stock.code}`).value) || 0;
+                if (shares > 0) {
+                    totalInvested += shares * stock.price;
+                }
+            });
+
+            const availableCash = INITIAL_CASH - totalInvested;
+            
+            const cashEl = document.getElementById('availableCash');
+            cashEl.textContent = `$${Math.max(0, availableCash).toLocaleString()}`;
+            
+            document.getElementById('investedAmount').textContent = 
+                `$${totalInvested.toLocaleString()}`;
+
+            // 如果超額，標記紅色
+            if (availableCash < 0) {
+                cashEl.classList.add('warning');
+                cashEl.classList.remove('cash');
+            } else {
+                cashEl.classList.add('cash');
+                cashEl.classList.remove('warning');
+            }
+        }
+
+        // 確認投資
+        function confirmInvestment() {
+            console.log('=== 開始確認投資 ===');
+            console.log('當前用戶:', currentUser);
+            
+            const player = gameData[currentUser.account];
+            console.log('玩家數據:', player);
+            
+            const now = simulatedTime || new Date();
+
+            if (!checkTradingTime(now)) {
+                alert('⚠️ 目前不在交易時間（週一至週五 8:00-8:59）\n提示：BC帳號可以使用測試模式來隨時交易');
+                return;
+            }
+
+            let totalInvested = 0;
+            const newInvestments = {};
+            let allStocksHaveShares = true;
+
+            console.log('開始讀取股票輸入...');
+            stocks.forEach(stock => {
+                const inputElement = document.getElementById(`shares_${stock.code}`);
+                const shares = parseInt(inputElement?.value) || 0;
+                console.log(`${stock.code} ${stock.name}: ${shares} 股`);
+                
+                if (shares > 0) {
+                    totalInvested += shares * stock.price;
+                    newInvestments[stock.code] = shares;
+                } else {
+                    allStocksHaveShares = false;
+                }
+            });
+
+            console.log('總投資金額:', totalInvested);
+            console.log('新投資組合:', newInvestments);
+            console.log('所有股票都有買嗎?', allStocksHaveShares);
+
+            // 檢查是否每支股票至少買1股
+            if (!allStocksHaveShares) {
+                const missingStocks = stocks.filter(s => !newInvestments[s.code]).map(s => s.name);
+                console.log('缺少的股票:', missingStocks);
+                if (!confirm(`⚠️ 規則要求每支股票至少要買一股以上！\n\n尚未購買的股票：${missingStocks.join('、')}\n\n您確定要繼續嗎？`)) {
+                    console.log('用戶取消投資');
+                    return;
+                }
+            }
+
+            if (totalInvested > INITIAL_CASH) {
+                alert('❌ 投資金額超過可用資金！');
+                console.log('投資金額超額');
+                return;
+            }
+
+            // 保存投資
+            console.log('保存前 - 玩家投資組合:', player.investments);
+            player.investments = newInvestments;
+            player.cash = INITIAL_CASH - totalInvested;
+            console.log('保存後 - 玩家投資組合:', player.investments);
+            console.log('保存後 - 玩家現金:', player.cash);
+            
+            saveGameData();
+            console.log('數據已保存到 localStorage');
+            
+            // 驗證保存
+            const savedData = JSON.parse(localStorage.getItem('stockGameData'));
+            console.log('驗證 localStorage 中的數據:', savedData[currentUser.account]);
+
+            alert(`✅ 投資確認成功！\n\n已投資: $${totalInvested.toLocaleString()}\n剩餘現金: $${player.cash.toLocaleString()}`);
+            
+            // 更新所有顯示
+            console.log('開始更新顯示...');
+            updatePlayerStatus();
+            updateRankings();
+            updatePortfolioDisplay();
+            console.log('=== 投資確認完成 ===');
+        }
+
+        // 重設投資
+        function resetInvestment() {
+            console.log('重設投資');
+            stocks.forEach(stock => {
+                const input = document.getElementById(`shares_${stock.code}`);
+                if (input) input.value = 0;
+            });
+            calculateInvestment();
+        }
+
+        // 更新玩家狀態
+        function updatePlayerStatus() {
+            const player = gameData[currentUser.account];
+            let totalValue = player.cash || INITIAL_CASH;
+
+            Object.entries(player.investments || {}).forEach(([code, shares]) => {
+                const stock = stocks.find(s => s.code === code);
+                if (stock) {
+                    totalValue += shares * stock.price;
+                }
+            });
+
+            player.totalValue = totalValue;
+            
+            document.getElementById('totalValue').textContent = 
+                `$${totalValue.toLocaleString()}`;
+            document.getElementById('weeklyScore').textContent = 
+                player.weeklyScore || 0;
+
+            saveGameData();
+        }
+
+        // 更新排名
+        function updateRankings() {
+            const rankings = Object.entries(gameData)
+                .map(([account, player]) => ({
+                    account,
+                    name: player.name,
+                    totalValue: player.totalValue || INITIAL_CASH,
+                    score: player.weeklyScore || 0
+                }))
+                .sort((a, b) => b.totalValue - a.totalValue);
+
+            const container = document.getElementById('rankingList');
+            container.innerHTML = rankings.map((player, index) => {
+                const rankClass = index === 0 ? 'rank-1' : 
+                                 index === 1 ? 'rank-2' : 
+                                 index === 2 ? 'rank-3' : 'rank-other';
+                
+                return `
+                    <div class="ranking-item ${player.account === currentUser.account ? 'current-player' : ''}">
+                        <div class="rank-number ${rankClass}">${index + 1}</div>
+                        <div class="player-details">
+                            <div class="player-name">${player.name}</div>
+                            <div class="player-stats">
+                                市值: $${player.totalValue.toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="player-score">${player.score}分</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新投資組合顯示
+        function updatePortfolioDisplay() {
+            console.log('=== 更新投資組合顯示 ===');
+            const container = document.getElementById('portfolioDisplay');
+            
+            let html = '<div style="display: grid; gap: 20px;">';
+            
+            Object.entries(gameData).forEach(([account, player]) => {
+                console.log(`玩家 ${account} (${player.name}):`, player);
+                console.log(`  投資組合:`, player.investments);
+                
+                const isCurrentPlayer = account === currentUser.account;
+                const investments = player.investments || {};
+                const hasInvestments = Object.keys(investments).length > 0;
+                
+                console.log(`  是當前玩家: ${isCurrentPlayer}`);
+                console.log(`  有投資: ${hasInvestments}`);
+                console.log(`  投資項目數量: ${Object.keys(investments).length}`);
+                
+                html += `
+                    <div style="background: ${isCurrentPlayer ? '#e8f4f8' : '#f8f9fa'}; padding: 20px; border-radius: 10px; border: ${isCurrentPlayer ? '2px solid #667eea' : '1px solid #e0e0e0'};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="color: #333; margin: 0;">
+                                ${player.name} ${isCurrentPlayer ? '(你)' : ''}
+                            </h3>
+                            <div style="text-align: right;">
+                                <div style="font-size: 14px; color: #666;">現金</div>
+                                <div style="font-size: 18px; font-weight: 700; color: #27ae60;">
+                                    $${(player.cash || INITIAL_CASH).toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+                `;
+                
+                if (hasInvestments) {
+                    console.log(`  開始顯示 ${Object.keys(investments).length} 項投資`);
+                    html += '<div style="display: grid; gap: 10px;">';
+                    
+                    Object.entries(investments).forEach(([code, shares]) => {
+                        console.log(`    ${code}: ${shares} 股`);
+                        const stock = stocks.find(s => s.code === code);
+                        if (stock && shares > 0) {
+                            const value = shares * stock.price;
+                            console.log(`      找到股票資料，價值: ${value}`);
+                            html += `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 5px;">
+                                    <div>
+                                        <span style="font-weight: 700; color: #333;">${stock.code}</span>
+                                        <span style="color: #666; margin-left: 10px;">${stock.name}</span>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 14px; color: #666;">${shares} 股 × $${stock.price.toFixed(2)}</div>
+                                        <div style="font-size: 16px; font-weight: 700; color: #667eea;">
+                                            $${value.toLocaleString()}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            console.log(`      找不到股票資料或股數為0`);
+                        }
+                    });
+                    
+                    html += '</div>';
+                } else {
+                    console.log(`  顯示：尚未投資`);
+                    html += `
+                        <div style="text-align: center; padding: 20px; color: #999;">
+                            尚未投資任何股票
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+            console.log('=== 投資組合顯示更新完成 ===');
+        }
+
+        // 更新時間提示
+        function updateTimerNotice() {
+            const now = simulatedTime || new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const day = now.getDay();
+            const container = document.getElementById('timerNotice');
+
+            // 週一到週五
+            if (day >= 1 && day <= 5) {
+                // 週五特別提示
+                if (day === 5) {
+                    container.innerHTML = `
+                        <div class="timer-notice success">
+                            ⭐ 今日是週五！積分加倍日！ ⭐
+                        </div>
+                    `;
+                }
+                
+                if (hour < 8) {
+                    container.innerHTML += `
+                        <div class="timer-notice info">
+                            ⏰ 今日資金將於 8:00 發放，8:30 股票數據更新
+                        </div>
+                    `;
+                } else if (hour === 8 && minute < 30) {
+                    container.innerHTML = `
+                        <div class="timer-notice urgent">
+                            ⚠️ 請在 8:59 前完成投資分配！剩餘時間: ${59 - minute} 分鐘
+                        </div>
+                    `;
+                } else if (hour === 8 && minute >= 30 && minute < 59) {
+                    container.innerHTML = `
+                        <div class="timer-notice urgent">
+                            ⚠️ 最後投資時間！剩餘 ${59 - minute} 分鐘
+                        </div>
+                    `;
+                } else if (hour < 14) {
+                    container.innerHTML = `
+                        <div class="timer-notice">
+                            📊 交易已截止，等待 14:00 結算
+                        </div>
+                    `;
+                } else if (hour < 17) {
+                    container.innerHTML = `
+                        <div class="timer-notice">
+                            ✅ 今日已結算完成，17:00 市值將歸零
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="timer-notice">
+                            💤 今日已結束，明日 8:00 開始新的一天
+                        </div>
+                    `;
+                }
+            } else {
+                container.innerHTML = `
+                    <div class="timer-notice">
+                        🏖️ 週末休息中，週一 8:00 見！
+                    </div>
+                `;
+            }
+        }
+        
+        // 🔧 測試模式控制函數
+        function toggleTestMode() {
+            TEST_MODE = !TEST_MODE;
+            const statusEl = document.getElementById('testModeStatus');
+            if (TEST_MODE) {
+                statusEl.textContent = '✅ 開啟（可隨時交易）';
+                statusEl.style.color = '#27ae60';
+                alert('✅ 測試模式已開啟！現在可以隨時交易股票。');
+            } else {
+                statusEl.textContent = '❌ 關閉';
+                statusEl.style.color = '#e74c3c';
+                alert('❌ 測試模式已關閉，恢復正常交易時間限制。');
+            }
+            updateStocksList();
+            updateTimerNotice();
+        }
+        
+        function setSimulatedTime(hour, minute) {
+            simulatedTime = new Date();
+            simulatedTime.setHours(hour, minute, 0);
+            alert(`⏰ 已設定模擬時間為 ${hour}:${minute < 10 ? '0' + minute : minute}`);
+            updateStocksList();
+            updateTimerNotice();
+        }
+        
+        function resetSimulatedTime() {
+            simulatedTime = null;
+            alert('⏰ 已恢復真實時間');
+            updateStocksList();
+            updateTimerNotice();
+        }
+        
+        function clearGameData() {
+            if (confirm('⚠️ 確定要清除所有遊戲數據嗎？\n這將重置所有玩家的投資和積分！')) {
+                console.log('清除 localStorage 數據');
+                localStorage.removeItem('stockGameData');
+                gameData = loadGameData();
+                console.log('數據已重置:', gameData);
+                alert('✅ 所有數據已清除並重置！');
+                updateStocksList();
+                updatePlayerStatus();
+                updateRankings();
+                updatePortfolioDisplay();
+            }
+        }
+    </script>
+</body>
+</html>
